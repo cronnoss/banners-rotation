@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package banner;
+option go_package = "./;pb";
+
+service BannerService {
+  rpc AddBanner (AddBannerRequest) returns (AddBannerResponse) {}
+  rpc RemoveBanner (RemoveBannerRequest) returns (RemoveBannerResponse) {}
+  rpc ClickBanner (ClickBannerRequest) returns (ClickBannerResponse) {}
+  rpc PickBanner (PickBannerRequest) returns (PickBannerResponse) {}
+}
+
+message AddBannerRequest {
+  int32 banner_id = 1;
+  int32 slot_id = 2;
+}
+
+message AddBannerResponse {
+  string message = 1;
+}
+
+message RemoveBannerRequest {
+  int32 banner_id = 1;
+  int32 slot_id = 2;
+}
+
+message RemoveBannerResponse {
+  string message = 1;
+}
+
+message ClickBannerRequest {
+  int32 banner_id = 1;
+  int32 slot_id = 2;
+  int32 usergroup_id = 3;
+}
+
+message ClickBannerResponse {
+  string message = 1;
+}
+
+message PickBannerRequest {
+  int32 slot_id = 1;
+  int32 usergroup_id = 2;
+}
+
+message PickBannerResponse {
+  int32 banner_id = 1;
+  string message = 2;
+}
