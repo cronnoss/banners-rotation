@@ -7,12 +7,12 @@ grpc:
   port: 8082
 
 storage:
-#  migration: "/etc/migrations"
-  migration: "migrations"
+  migration: "/etc/migrations"
+#  migration: "migrations"
 
 database:
-#  host: "postgres"
-  host: "localhost"
+  host: "postgres"
+#  host: "localhost"
   port: 5432
   dbname: "postgres"
   username: "postgres"
@@ -22,8 +22,8 @@ rmq:
   rabbitmqProtocol: "amqp"
   rabbitmqUsername: "guest"
   rabbitmqPassword: "guest"
-  rabbitmqHost: "localhost"
-#  rabbitmqHost: rabbitmq
+#  rabbitmqHost: "localhost"
+  rabbitmqHost: rabbitmq
   rabbitmqPort: 5672
   reConnect:
     maxElapsedTime: "1m"

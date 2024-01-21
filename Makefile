@@ -24,9 +24,35 @@ generate:
         --go-grpc_out=./internal/server/pb \
         api/*.proto
 
+build-img:
+	docker build \
+		--build-arg=LDFLAGS="$(LDFLAGS)" \
+		-t $(DOCKER_IMG) \
+		-f build/banner/Dockerfile .
+
+run-img: build-img
+	docker run $(DOCKER_IMG)
+
+up:
+	docker-compose -f docker-compose.yaml up --build -d ;\
+	docker-compose up -d
+
+down:
+	docker-compose down
+
 test:
 	go clean -testcache;
 	go test -v -race -count 100 ./internal/...
+
+integration-tests:
+		set -e ;\
+    	docker-compose -f docker-compose.test.yaml up --build -d ;\
+    	test_status_code=0 ;\
+    	docker-compose -f docker-compose.test.yaml run integration_tests go test ./test/integration_test.go || test_status_code=$$? ;\
+    	docker-compose -f docker-compose.test.yaml down ;\
+    	echo $$test_status_code ;\
+    	exit $$test_status_code ;
+
 
 build:
 	go build -v -o $(API_BIN) -ldflags "$(LDFLAGS)" ./cmd/banner
