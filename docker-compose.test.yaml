@@ -1,0 +1,93 @@
+version: "3"
+
+networks:
+  rmq:
+    driver: bridge
+  db:
+    driver: bridge
+
+services:
+
+  integration_tests:
+    container_name: integration_tests
+    build:
+      context: .
+      dockerfile: ./test/Dockerfile
+    depends_on:
+      - postgres
+      - banner
+      - rabbitmq
+    environment:
+      POSTGRES_HOST: composepostgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      GRPC_HOST: banner
+      GRPC_PORT: 8082
+      RABBITMQ_HOST: rabbitmq
+    #      RMQ_URI: "amqp://guest:guest@rabbitmq:5672/"
+    networks:
+      - db
+      - rmq
+
+  banner:
+    container_name: banner
+    build:
+      context: .
+      dockerfile: build/banner/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    expose:
+      - 8082
+    environment:
+      POSTGRES_HOST: composepostgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      GRPC_HOST: "0.0.0.0"
+      GRPC_PORT: 8082
+      RABBITMQ_PROTOCOL: amqp
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    networks:
+      - db
+      - rmq
+
+  postgres:
+    container_name: composepostgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - db
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    expose:
+      - 15672
+      - 5672
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_HOST: rabbitmq
+      RABBITMQ_DEFAULT_PORT: 5672
+    networks:
+      - rmq
